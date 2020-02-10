@@ -2,7 +2,7 @@ import {
     Body,
     Controller,
     Delete,
-    Get,
+    Get, Logger,
     Param,
     ParseIntPipe,
     Patch,
@@ -20,15 +20,17 @@ import {Task} from "./task.entity";
 import {AuthGuard} from "@nestjs/passport";
 import {GetUser} from "../auth/get-user.decoorator";
 import {User} from "../auth/user.entity";
+import {filter} from "rxjs/operators";
 
 @Controller('tasks')
 @UseGuards(AuthGuard())
 export class TasksController {
-    constructor(private tasksService: TasksService) {
-    }
+    private logger = new Logger('TasksController');
+    constructor(private tasksService: TasksService) {}
 
     @Get()
     async getTasks(@Query(ValidationPipe) filterDto: GetTasksFilterDto, @GetUser() user: User): Promise<Task[]> {
+        this.logger.verbose(`User "${user.username}" retrieving all tasks. Filters: ${JSON.stringify(filterDto)}`);
         return this.tasksService.getTasks(filterDto, user)
     }
 
@@ -40,6 +42,7 @@ export class TasksController {
     @Post()
     @UsePipes(ValidationPipe)
     createTask(@Body() createTaskDto: CreateTaskDto, @GetUser() user: User): Promise<Task> {
+        this.logger.verbose(`User "${user.username}" creating a new task. Data: ${JSON.stringify(CreateTaskDto)}`);
         return this.tasksService.createTask(createTaskDto, user);
     }
 
