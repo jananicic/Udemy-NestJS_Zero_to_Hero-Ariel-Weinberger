@@ -7,4 +7,5 @@ db:
   database: 'taskmanagement'
 
 jwt:
+  secret: 'topSecret51'
   experiseIn: 3600
